@@ -1,0 +1,25 @@
+{
+    "manifest_version": 2,
+  
+    "name" : "Вставить личные данные",
+  
+    "version": "0.1",
+  
+    "permissions" : [
+        "contextMenus",
+        "tabs",
+        "storage"
+    ],
+
+    "background": {
+        "persistent": false,
+        "scripts": ["background.js"]
+    },
+  
+    "options_page": "options_page.html",
+
+    "content_scripts": [{
+        "matches": ["http://*/*", "https://*/*"],
+        "js": ["content.js"]
+    }]
+}
