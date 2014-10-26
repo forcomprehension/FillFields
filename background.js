@@ -34,35 +34,60 @@ var contextMenus = [
 /**
  * Building context menu from plain object
  *
- * @param {object}           menuLevel
- * @param {String|undefined} parentID
+ * @param {Array} menuLevel
  *
  * @return undefined
  */
-var buildContextMenu = function (menuLevel, parentID)
+var buildContextMenu = function (menuLevel)
 {
-    menuLevel.forEach(function(element) {
-        var nextLevel;
+    if (menuLevel.length === 1) {
 
-        element.contexts = ["editable"];
+        var parentID = 'main_id';
 
-        var passingObject = {
-            'id': element.id,
-            'title': element.title,
-            'contexts': ['editable']
-        };
+        menuLevel[0].parentId = parentID;
+
+        menuLevel = [{
+            'id': parentID,
+            'title': 'Вставить личные данные',
+            'nextLevel': [
+                menuLevel[0]
+            ]
+        }];
+    }
+
+    /**
+     * Internal Iterator
+     *
+     * @param {Array}            menuLevel
+     * @param {String|undefined} parentID
+     */
+    var iterateMenu = function (menuLevel, parentID)
+    {
+        menuLevel.forEach(function(element) {
+            var nextLevel;
+
+            element.contexts = ["editable"];
+
+            var passingObject = {
+                'id': element.id,
+                'title': element.title,
+                'contexts': ['editable']
+            };
 
 
-        if (parentID != undefined) {
-            passingObject.parentId = parentID;
-        }
+            if (parentID != undefined) {
+                passingObject.parentId = parentID;
+            }
 
-        chrome.contextMenus.create(passingObject);
+            chrome.contextMenus.create(passingObject);
 
-        if (element.hasOwnProperty("nextLevel") && element.nextLevel.length) {
-            buildContextMenu(element.nextLevel, element.id);
-        }
-    });
+            if (element.hasOwnProperty("nextLevel") && element.nextLevel.length) {
+                iterateMenu(element.nextLevel, element.id);
+            }
+        });
+    };
+
+    iterateMenu(menuLevel);
 };
 
 /**
